@@ -20,10 +20,6 @@ public class ProdutoApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		/*
-		productRepository.save(new ProductModel( "pizza frango catupiry", "Pizza 8 pedaços", 20.0, true));
-		productRepository.save(new ProductModel("pizza frango", "Pizza 8 pedaços", 25.0, true));
-		productRepository.save(new ProductModel("pizza mussarela", "Pizza 8 pedaços", 30.0, true));
-		*/
+
 	}
 }
