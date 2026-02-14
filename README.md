@@ -39,4 +39,5 @@ Body da requisição:
     "ativo": true //STATUS DO PRODUTO
 }
 
+Deletar o produto
 Rota do tipo DELETE: localhost:8080/api/produtos?idProduto={idProduto}
