@@ -2,13 +2,15 @@ package com.delivery.produto.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
+@SQLRestriction("datadelete IS NULL")
 @Table(name = "TB_Produto")
 public class ProductModel {
 
@@ -16,25 +18,27 @@ public class ProductModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idProduto;
 
-    @Column ( name = "Nome_Produto", nullable = false)
+    @Column ( name = "nomeproduto", nullable = false)
     private String nomeProduto;
 
-    @Column ( name = "Descricao_Produto", nullable = false)
+    @Column ( name = "descricaoproduto", nullable = false)
     private String descricaoProduto;
 
-    @Column ( name = "Preco_Produto", nullable = false)
+    @Column ( name = "precoproduto", nullable = false)
     private Double precoProduto;
 
-    @Column ( name = "Status_Produto", nullable = false)
+    @Column ( name = "ativo", nullable = false)
     private Boolean ativo;
 
-    public ProductModel(String nomeProduto, String descricaoProduto, double precoProduto, boolean ativo) {
+    @Column (name = "datainsert", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime datainsert;
 
-        this.nomeProduto = nomeProduto;
-        this.descricaoProduto = descricaoProduto;
-        this.precoProduto = precoProduto;
-        this.ativo = ativo;
-    }
+    @Column(name = "datadelete", nullable = true)
+    private LocalDateTime dataDelete;
+
+
+
+
 
 
 }

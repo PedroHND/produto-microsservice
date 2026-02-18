@@ -1,7 +1,8 @@
 package com.delivery.produto.controller;
 
-import com.delivery.produto.model.ProductModel;
-import com.delivery.produto.service.ProductService;
+import com.delivery.produto.dto.ProductRequestDTO;
+import com.delivery.produto.dto.ProductResponseDTO;
+import com.delivery.produto.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,37 +14,59 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductService productService;
+    private final IProductService productService;
 
     @PostMapping
-    public ResponseEntity<Void> salvarProduto(@RequestBody ProductModel  produto ) {
-        productService.salvarProduto(produto);
-        return  ResponseEntity.ok().build();
+    public ResponseEntity<ProductResponseDTO> salvarProduto(@RequestBody ProductRequestDTO produto ) {
+        return  ResponseEntity.ok(productService.salvarProduto(produto));
     }
 
     @GetMapping()
-    public ResponseEntity findAll() {
-        List<ProductModel> produtos =  productService.finAll();
-        if(produtos.isEmpty()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(produtos);
+    public ResponseEntity<List<ProductResponseDTO>> procurarTodos() {
+        return ResponseEntity.ok(productService.procurarTodos());
+    }
+
+    @GetMapping("/cardapio")
+    public ResponseEntity<List<ProductResponseDTO>> procurarTodosAtivos() {
+        return ResponseEntity.ok(productService.procurarTodosAtivos());
+    }
+
+    @GetMapping("/verificar/{idProduto}")
+    public ResponseEntity<ProductResponseDTO> verificarProdutoCompleto(@PathVariable("idProduto") Long idProduto){
+        return  ResponseEntity.ok(productService.procurarPorID(idProduto));
     }
 
     @GetMapping("/{idProduto}")
-    public ResponseEntity findById(@PathVariable Long idProduto){
-        return  ResponseEntity.ok(productService.findById(idProduto));
+    public ResponseEntity<ProductResponseDTO> buscarProdutoAtivo(@PathVariable("idProduto") Long idProduto) {
+        return ResponseEntity.ok(productService.procurarPorIDAtivo(idProduto));
     }
 
-    @DeleteMapping()
-    public ResponseEntity<Void> deleteById(@RequestParam Long idProduto){
-        productService.deleteById(idProduto);
-        return  ResponseEntity.ok().build();
+    @PutMapping("/atualizar/{idProduto}")
+    public ResponseEntity<ProductResponseDTO> atualizarProduto(@PathVariable Long idProduto, @RequestBody ProductRequestDTO produto){
+
+        return  ResponseEntity.ok(productService.atualizarProduto(idProduto, produto));
     }
 
-    @PutMapping()
-    public ResponseEntity<Void> atualizarProduto(@RequestParam Long idProduto, @RequestBody ProductModel  produto){
-        productService.atualizarProduto(idProduto, produto);
-        return  ResponseEntity.ok().build();
+    @PatchMapping("/inativar/{idProduto}")
+    public ResponseEntity<Void> inativarPorID(@PathVariable Long idProduto){
+        productService.inativarPorID(idProduto);
+        return  ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/deletar/{idProduto}")
+    public ResponseEntity<Void> deletarPorID(@PathVariable Long idProduto){
+        productService.excluirProdutoLogico(idProduto);
+        return  ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/recuperar/{idProduto}")
+    public ResponseEntity<Void> recuperarPorID(@PathVariable Long idProduto){
+        productService.recuperarProduto(idProduto);
+        return  ResponseEntity.noContent().build();
+    }
+
+
+
+
+
 }
