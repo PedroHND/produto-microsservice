@@ -59,6 +59,16 @@ public class ProductService implements IProductService {
         productModel.setAtivo(false);
         productRepository.save(productModel);
    }
+
+    @Override
+    public void ativarPorID(Long id){
+        ProductModel productModel = productRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Produto não Encontrado com ID: " + id)
+        );
+        productModel.setAtivo(true);
+        productRepository.save(productModel);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDTO> procurarTodosAtivos() {

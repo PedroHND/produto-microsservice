@@ -15,6 +15,8 @@ public interface IProductService {
 
     void inativarPorID(Long id);
 
+    void ativarPorID(Long id);
+
     ProductResponseDTO atualizarProduto(Long idProduto, ProductRequestDTO productRequestDTO);
 
     List<ProductResponseDTO> procurarTodosAtivos();
