@@ -2,6 +2,7 @@ package com.delivery.produto.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLRestriction;
 import java.time.LocalDateTime;
 
@@ -30,7 +31,8 @@ public class ProductModel {
     @Column ( name = "ativo", nullable = false)
     private Boolean ativo;
 
-    @Column (name = "datainsert", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp
+    @Column(name = "datainsert", nullable = false, updatable = false)
     private LocalDateTime datainsert;
 
     @Column(name = "datadelete", nullable = true)

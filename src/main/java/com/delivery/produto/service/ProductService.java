@@ -8,7 +8,6 @@ import com.delivery.produto.repository.IProductRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +23,7 @@ public class ProductService implements IProductService {
     private final IProductMapper productMapper = Mappers.getMapper(IProductMapper.class);
 
     @Override
+    @Transactional
     public ProductResponseDTO salvarProduto(ProductRequestDTO productRequestDTO){
         return productMapper.productResponseDTO(
                 productRepository.save(
@@ -36,13 +36,17 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public ProductResponseDTO procurarPorID(Long id){
-        return productMapper.productResponseDTO(productRepository.findById(id).get());
+    public ProductResponseDTO procurarPorID(Long idProduto){
+        return productRepository.findById(idProduto)
+                .map(productMapper::productResponseDTO)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Produto não encontrado ou inativo")
+                );
     }
 
     public ProductResponseDTO atualizarProduto(Long idProduto, ProductRequestDTO produtoNovo){
         ProductModel produtoAtual = productRepository.findById(idProduto).orElseThrow(
-                () -> new RuntimeException("Produto não encontrado com ID: " + idProduto)
+                () -> new EntityNotFoundException("Produto não encontrado com o ID: " + idProduto)
         );
 
         productMapper.updateModel(produtoNovo, produtoAtual);
@@ -52,18 +56,18 @@ public class ProductService implements IProductService {
     }
 
    @Override
-    public void inativarPorID(Long id){
-        ProductModel productModel = productRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Produto não Encontrado com ID: " + id)
+    public void inativarPorID(Long idProduto){
+        ProductModel productModel = productRepository.findById(idProduto).orElseThrow(
+                () -> new EntityNotFoundException("ID " + idProduto + " não existe para inativação.")
         );
         productModel.setAtivo(false);
         productRepository.save(productModel);
    }
 
     @Override
-    public void ativarPorID(Long id){
-        ProductModel productModel = productRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Produto não Encontrado com ID: " + id)
+    public void ativarPorID(Long idProduto){
+        ProductModel productModel = productRepository.findById(idProduto).orElseThrow(
+                () -> new EntityNotFoundException("ID " + idProduto + " não existe para inativação.")
         );
         productModel.setAtivo(true);
         productRepository.save(productModel);
@@ -78,16 +82,21 @@ public class ProductService implements IProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductResponseDTO procurarPorIDAtivo(Long id) {
-        return productRepository.findByIdProdutoAndAtivoTrue(id)
+    public ProductResponseDTO procurarPorIDAtivo(Long idProduto) {
+        return productRepository.findByIdProdutoAndAtivoTrue(idProduto)
                 .map(productMapper::productResponseDTO)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado ou inativo"));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Produto não encontrado ou inativo")
+                );
     }
+
     @Override
     @Transactional
     public void excluirProdutoLogico(Long id) {
         ProductModel produto = productRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+                .orElseThrow(
+                        () -> new EntityNotFoundException("Produto não encontrado")
+                );
 
         produto.setDataDelete(LocalDateTime.now());
 
@@ -98,7 +107,9 @@ public class ProductService implements IProductService {
     @Override
     @Transactional
     public void recuperarProduto(Long id) {
-        ProductModel produto = productRepository.findByIdDeletado(id).orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
+        ProductModel produto = productRepository.findByIdDeletado(id).orElseThrow(
+                () -> new EntityNotFoundException("Produto não encontrado")
+        );
         produto.setDataDelete(null);
         productRepository.save(produto);
     }
